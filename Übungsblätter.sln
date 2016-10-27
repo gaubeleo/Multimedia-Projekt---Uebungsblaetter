@@ -1,0 +1,58 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "1.2 Color Analysis", "1.2 Color Analysis\1.2 Color Analysis.vcxproj", "{B48B2055-0BCD-41BA-B2EF-1FF241444CDB}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "0.3 Hello OpenCV-World", "..\Übungsblatt 0\Übungsblatt 0\0.3 Hello OpenCV-World\0.3 Hello OpenCV-World.vcxproj", "{90C6D0FB-ACDD-4545-98F3-24FE8DA237C6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "1.1 Gray Scale Histograms", "1.1 Gray Scale Histograms\1.1 Gray Scale Histograms.vcxproj", "{238C57A8-353D-41C6-8C20-5EBB0118B157}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "1.3 Interactive Color Histograms", "1.3 Interactive Color Histograms\1.3 Interactive Color Histograms.vcxproj", "{5AA64E72-054F-47E8-98D3-C6979CE4C21F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B48B2055-0BCD-41BA-B2EF-1FF241444CDB}.Debug|Win32.ActiveCfg = Debug|x64
+		{B48B2055-0BCD-41BA-B2EF-1FF241444CDB}.Debug|Win32.Build.0 = Debug|x64
+		{B48B2055-0BCD-41BA-B2EF-1FF241444CDB}.Debug|x64.ActiveCfg = Debug|x64
+		{B48B2055-0BCD-41BA-B2EF-1FF241444CDB}.Debug|x64.Build.0 = Debug|x64
+		{B48B2055-0BCD-41BA-B2EF-1FF241444CDB}.Release|Win32.ActiveCfg = Release|x64
+		{B48B2055-0BCD-41BA-B2EF-1FF241444CDB}.Release|Win32.Build.0 = Release|x64
+		{B48B2055-0BCD-41BA-B2EF-1FF241444CDB}.Release|x64.ActiveCfg = Release|x64
+		{B48B2055-0BCD-41BA-B2EF-1FF241444CDB}.Release|x64.Build.0 = Release|x64
+		{90C6D0FB-ACDD-4545-98F3-24FE8DA237C6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{90C6D0FB-ACDD-4545-98F3-24FE8DA237C6}.Debug|Win32.Build.0 = Debug|Win32
+		{90C6D0FB-ACDD-4545-98F3-24FE8DA237C6}.Debug|x64.ActiveCfg = Debug|x64
+		{90C6D0FB-ACDD-4545-98F3-24FE8DA237C6}.Debug|x64.Build.0 = Debug|x64
+		{90C6D0FB-ACDD-4545-98F3-24FE8DA237C6}.Release|Win32.ActiveCfg = Release|x64
+		{90C6D0FB-ACDD-4545-98F3-24FE8DA237C6}.Release|Win32.Build.0 = Release|x64
+		{90C6D0FB-ACDD-4545-98F3-24FE8DA237C6}.Release|x64.ActiveCfg = Release|x64
+		{90C6D0FB-ACDD-4545-98F3-24FE8DA237C6}.Release|x64.Build.0 = Release|x64
+		{238C57A8-353D-41C6-8C20-5EBB0118B157}.Debug|Win32.ActiveCfg = Debug|Win32
+		{238C57A8-353D-41C6-8C20-5EBB0118B157}.Debug|Win32.Build.0 = Debug|Win32
+		{238C57A8-353D-41C6-8C20-5EBB0118B157}.Debug|x64.ActiveCfg = Debug|x64
+		{238C57A8-353D-41C6-8C20-5EBB0118B157}.Debug|x64.Build.0 = Debug|x64
+		{238C57A8-353D-41C6-8C20-5EBB0118B157}.Release|Win32.ActiveCfg = Release|x64
+		{238C57A8-353D-41C6-8C20-5EBB0118B157}.Release|Win32.Build.0 = Release|x64
+		{238C57A8-353D-41C6-8C20-5EBB0118B157}.Release|x64.ActiveCfg = Release|x64
+		{238C57A8-353D-41C6-8C20-5EBB0118B157}.Release|x64.Build.0 = Release|x64
+		{5AA64E72-054F-47E8-98D3-C6979CE4C21F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5AA64E72-054F-47E8-98D3-C6979CE4C21F}.Debug|Win32.Build.0 = Debug|Win32
+		{5AA64E72-054F-47E8-98D3-C6979CE4C21F}.Debug|x64.ActiveCfg = Debug|x64
+		{5AA64E72-054F-47E8-98D3-C6979CE4C21F}.Debug|x64.Build.0 = Debug|x64
+		{5AA64E72-054F-47E8-98D3-C6979CE4C21F}.Release|Win32.ActiveCfg = Release|Win32
+		{5AA64E72-054F-47E8-98D3-C6979CE4C21F}.Release|Win32.Build.0 = Release|Win32
+		{5AA64E72-054F-47E8-98D3-C6979CE4C21F}.Release|x64.ActiveCfg = Release|x64
+		{5AA64E72-054F-47E8-98D3-C6979CE4C21F}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
