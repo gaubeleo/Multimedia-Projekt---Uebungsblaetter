@@ -40,45 +40,27 @@ bool saveImg(string directory, string filename, Mat img){
 	return imwrite(fullFilename, img);
 }
 
-void drawRect(Mat img, unsigned x1, unsigned y1, unsigned x0, unsigned y0){
-	unsigned x = min(x0, x1);
-	unsigned y = min(y0, y1);
-	unsigned width = max(x0, x1)-x;
-	unsigned height = max(y0, y1)-y;
+vector<Mat> splitChannels(Mat img) {
+	assert(img.channels() == 3);
 
-	rectangle(img, Rect(x, y, width, height), Scalar(0, 0, 255), 2);
+	vector<Mat> channels;
 
-	cout << "Rect at - " << "x: " << x << ", y: " << y << ", width: " << width << ", height: " << height << endl;
+	//split(img, channels);
 
-	imshow("Image", img);
-}
-
-struct Mouse{
-	bool leftDown = false;
-	unsigned xClick = 0;
-	unsigned yClick = 0;
-} MOUSE;
-
-void callBackFunc(int event, int x, int y, int flags, void* userdata)
-{
-	if (event == EVENT_LBUTTONDOWN)
-	{
-		MOUSE.leftDown = true;
-		MOUSE.xClick = x;
-		MOUSE.yClick = y;
+	for (int i = 0; i < 3; i++) {
+		channels.push_back(Mat(img.rows, img.cols, CV_8UC1));
 	}
-	else if (event == EVENT_LBUTTONUP && MOUSE.leftDown)
-	{
-		Mat img = *(Mat*)userdata;
-		drawRect(img.clone(), x, y, MOUSE.xClick, MOUSE.yClick);
-		MOUSE.leftDown = false;
 
+	for (int y = 0; y < img.rows; y++) {
+		Vec3b* row = img.ptr<Vec3b>(y);
+		for (int x = 0; x < img.cols; x++) {
+			for (int c = 0; c < 3; c++) {
+				channels[c].at<uchar>(Point(x, y)) = row[x][c];
+			}
+		}
 	}
-	//else if (event == EVENT_MOUSEMOVE)
-	//{
-	//	if (MOUSE.leftDown)
-	//		cout << "Mouse move over the window - position (" << x << ", " << y << ")" << endl;
-	//}
+
+	return channels;
 }
 
 uchar quantize(uchar value, unsigned binCount){
@@ -105,8 +87,8 @@ vector<int> calcHistogram(Mat img, unsigned binCount){
 // normalizes using a fixed value
 Mat createHistogramImage(vector<int> histogramValues, int normalizeValue) {
 	int binCount = (int)histogramValues.size();
-	int width = 256 * 3 / binCount*binCount;
-	int height = 500;
+	int width = 256 * 2 / binCount*binCount;
+	int height = 400;
 	int binWidth = width / binCount;
 
 	Mat histogram(height, width, CV_8UC1, Scalar(255));
@@ -122,15 +104,88 @@ Mat createHistogramImage(vector<int> histogramValues, int normalizeValue) {
 	return histogram;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Mat cropImg(Mat img, Rect rect){
+	return img(Range(rect.y, rect.y + rect.height), Range(rect.x, rect.x + rect.width)).clone();
+}
+
+Rect drawRect(Mat img, unsigned x1, unsigned y1, unsigned x0, unsigned y0, Scalar color){
+	unsigned x = min(x0, x1);
+	unsigned y = min(y0, y1);
+	unsigned width = max(x0, x1)-x;
+	unsigned height = max(y0, y1)-y;
+
+	Rect rect(x, y, width, height);
+	rectangle(img, rect, color, 2);
+
+	imshow("Image", img);
+
+	return rect;
+}
+
+void cropRectImg(Mat img, Rect rect){
+	Mat croppedImg = cropImg(img, rect);
+	vector<Mat> croppedImgChannels = splitChannels(croppedImg);
+
+	Mat histogramRed = createHistogramImage(calcHistogram(croppedImgChannels[2], 100), 10000);
+	Mat histogramGreen = createHistogramImage(calcHistogram(croppedImgChannels[1], 100), 10000);
+	Mat histogramBlue = createHistogramImage(calcHistogram(croppedImgChannels[0], 100), 10000);
+
+	imshow("Cropped Image", croppedImg);
+
+	imshow("Cropped Histogram Red", histogramRed);
+	imshow("Cropped Histogram Green ", histogramGreen);
+	imshow("Cropped Histogram Blue", histogramBlue);
+
+	cout << "Rect at - " << "x: " << rect.x << ", y: " << rect.y << ", width: " << rect.width << ", height: " << rect.height << endl;
+}
+
+struct Mouse{
+	bool leftDown = false;
+	unsigned xClick = 0;
+	unsigned yClick = 0;
+} MOUSE;
+
+void callBackFunc(int event, int x, int y, int flags, void* userdata)
+{
+	Mat img = *(Mat*)userdata;
+	if (event == EVENT_LBUTTONDOWN)
+	{
+		unsigned x0 = min(max(0, x), img.cols);
+		unsigned y0 = min(max(0, y), img.rows);
+		
+		MOUSE.xClick = x;
+		MOUSE.yClick = y;
+
+		MOUSE.leftDown = true;
+	}
+	else if (event == EVENT_LBUTTONUP && MOUSE.leftDown)
+	{
+		unsigned x1 = min(max(0, x), img.cols);
+		unsigned y1 = min(max(0, y), img.rows);
+
+		if (x1 != MOUSE.xClick && y1 != MOUSE.yClick){
+			Rect rect = drawRect(img.clone(), x1, y1, MOUSE.xClick, MOUSE.yClick, Scalar(0, 255, 0));
+			cropRectImg(img, rect);
+		}
+		
+		MOUSE.leftDown = false;
+	}
+	else if (event == EVENT_MOUSEMOVE && MOUSE.leftDown)
+	{
+		unsigned x1 = min(max(0, x), img.cols);
+		unsigned y1 = min(max(0, y), img.rows);
+
+		drawRect(img.clone(), x1, y1, MOUSE.xClick, MOUSE.yClick, Scalar(0, 0, 255));
+	}
+}
+
 void waitForMouseDrag(Mat img){
 	namedWindow("Image");
-	namedWindow("Histogram");
-
-	Mat histogram = createHistogramImage(calcHistogram(img, 300), 20000);
 
 	setMouseCallback("Image", callBackFunc, &img);
 	imshow("Image", img);
-	imshow("Histogram", histogram);
 
 	waitKey();
 	destroyAllWindows();
