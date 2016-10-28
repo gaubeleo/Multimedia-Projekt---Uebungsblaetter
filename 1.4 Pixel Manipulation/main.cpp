@@ -41,28 +41,38 @@ bool saveImg(string directory, string filename, Mat img){
 }
 
 Mat simulateLowRes(Mat img, int n){
-	Mat lowResImg(img.rows, img.cols, CV_8UC1);
+	assert(n > 0);
+	assert(img.channels() == 1);
 
-	for (int y = 0; y < img.rows; y += n){
-		for (int x = 0; x < img.cols; x += n){
-			int value = 0;
-			for (int yi = 0; yi < n; yi++){
-				for (int xi = 0; xi < n; xi++){
-					value += img.at<uchar>(y, x);
-				}
-			}
-			for (int yi = 0; yi < n; yi++){
-				for (int xi = 0; xi < n; xi++){
-					lowResImg.at<uchar>(y, x) = value / (n*n);
+	//use float Mat to save values properly
+	Mat lowResImg(img.rows - (img.rows%n), img.cols - (img.cols%n), CV_32FC1, Scalar(0.));
+
+	for (int y = 0; y < lowResImg.rows; y++){
+		uchar* row = img.ptr<uchar>(y);
+		for (int x = 0; x < lowResImg.cols; x++){
+			uchar value = row[x];
+			for (int yOff = 0; yOff < n; yOff++){
+				for (int xOff = 0; xOff < n; xOff++){
+					lowResImg.at<float>((y / n)*n + yOff, (x / n)*n + xOff) += ((float)value) / (n*n);
 				}
 			}
 		}
 	}
+	//Convert back to unsigned char Mat
+	lowResImg.convertTo(lowResImg, CV_8UC1);
+
+	saveImg("results", "lowResImg_" + to_string(n) + ".jpg", lowResImg);
+
+	imshow("low resolution image", lowResImg);
+	waitKey();
+	destroyAllWindows();
 
 	return lowResImg;
 }
 
 Mat quantizeImg(Mat img, int q){
+	assert(img.channels() == 1);
+
 	Mat quantizedImg(img.rows, img.cols, CV_8UC1);
 
 	for (int y = 0; y < img.rows; y++){
@@ -73,26 +83,29 @@ Mat quantizeImg(Mat img, int q){
 		}
 	}
 
+	saveImg("results", "quantizedImg_" + to_string(q) + ".jpg", quantizedImg);
+
+	imshow("low resolution image", quantizedImg);
+	waitKey();
+	destroyAllWindows();
+
 	return quantizedImg;
 }
 
 int main(int argc, char* argv[]) {
-	/*if (argc != 4){
+	if (argc != 4){
 		cout << "this program needs to be run with three command line parameters: <filename> <int> <int>" << endl;
-		cout << "example: '1.4 Pixel Manipulation.exe' 'src\\lenna.jpg' 3 3" << endl;
+		cout << "example: '1.4 Pixel Manipulation.exe' \"src\\lenna.jpg\" 3 3" << endl;
 		return -1;
-	}*/
+	}
 
-	string dir = "", filename = "";
+	string dir = "";
+	string filename = "";
 
 	string fullFilename(argv[1]);
 
 	dir = fullFilename.substr(0, fullFilename.rfind("\\"));
-	//filename = fullFilename.substr(fullFilename.rfind("\\")+1, fullFilename.length);
-
-	cout << dir << filename << endl;
-
-	return 0;
+	filename = fullFilename.substr(fullFilename.rfind("\\")+1);
 
 	Mat img = loadImg(dir, filename, IMREAD_GRAYSCALE);
 
@@ -112,6 +125,11 @@ int main(int argc, char* argv[]) {
 	}
 
 	quantizeImg(img, q);
+
+	//for (int i : {2, 4, 8}){
+	//	simulateLowRes(img, i);
+	//	quantizeImg(img, i);
+	//}
 
 	return 0;
 }
