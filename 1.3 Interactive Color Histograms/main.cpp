@@ -69,7 +69,7 @@ uchar quantize(uchar value, unsigned binCount){
 
 vector<int> calcHistogram(Mat img, unsigned binCount){
 	assert(img.channels() == 1);
-	assert(binCount < (1 << img.depth()));
+	//assert(binCount < (1 << img.depth()));
 
 	vector<int> histogramValues(binCount, 0);
 
@@ -195,7 +195,7 @@ void waitForMouseDrag(Mat img){
 int main(){
 	Mat img = loadImg("src", "IMG_6211.jpg", IMREAD_COLOR);
 
-	// Aufgabe a)
+	// Aufgabe a) + b)
 	waitForMouseDrag(img);
 
 	return 0;

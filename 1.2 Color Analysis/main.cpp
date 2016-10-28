@@ -85,7 +85,7 @@ unsigned quantize(uchar value, unsigned binCount){
 
 void calc3DHistogram(Mat img, unsigned binCount){
 	assert(img.channels() == 3);
-	assert(binCount <= 1 << img.depth());
+	//assert(binCount <= 1 << img.depth());
 
 	// 3D-histogram in BGR-format
 	vector<vector<vector<int>>> histogram(256, vector<vector<int>>(256, vector<int>(256)));

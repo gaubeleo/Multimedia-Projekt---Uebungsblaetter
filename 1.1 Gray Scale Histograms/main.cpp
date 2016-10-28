@@ -45,7 +45,7 @@ uchar quantize(uchar value, unsigned binCount){
 
 vector<int> calcHistogram(Mat img, unsigned binCount){
 	assert(img.channels() == 1);
-	assert(binCount <= 1<<img.depth());
+	//assert(binCount <= (1<<img.depth()));
 
 	vector<int> histogramValues(binCount, 0);
 
