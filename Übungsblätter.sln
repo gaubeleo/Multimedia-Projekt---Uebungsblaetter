@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "1.4 Pixel Manipulation", "1
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "2.1 Image Filters", "2.1 Image Filters\2.1 Image Filters.vcxproj", "{3463B793-DF18-413A-97FB-0D1193206313}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "2.2 Gradients", "2.2 Gradients\2.2 Gradients.vcxproj", "{3A64B0BD-52D7-4CB7-99E7-CA4FF4406BDD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -83,6 +85,18 @@ Global
 		{3463B793-DF18-413A-97FB-0D1193206313}.Release|Win32.Build.0 = Release|Win32
 		{3463B793-DF18-413A-97FB-0D1193206313}.Release|x64.ActiveCfg = Release|x64
 		{3463B793-DF18-413A-97FB-0D1193206313}.Release|x64.Build.0 = Release|x64
+		{3A64B0BD-52D7-4CB7-99E7-CA4FF4406BDD}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{3A64B0BD-52D7-4CB7-99E7-CA4FF4406BDD}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{3A64B0BD-52D7-4CB7-99E7-CA4FF4406BDD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3A64B0BD-52D7-4CB7-99E7-CA4FF4406BDD}.Debug|Win32.Build.0 = Debug|Win32
+		{3A64B0BD-52D7-4CB7-99E7-CA4FF4406BDD}.Debug|x64.ActiveCfg = Debug|x64
+		{3A64B0BD-52D7-4CB7-99E7-CA4FF4406BDD}.Debug|x64.Build.0 = Debug|x64
+		{3A64B0BD-52D7-4CB7-99E7-CA4FF4406BDD}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{3A64B0BD-52D7-4CB7-99E7-CA4FF4406BDD}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{3A64B0BD-52D7-4CB7-99E7-CA4FF4406BDD}.Release|Win32.ActiveCfg = Release|Win32
+		{3A64B0BD-52D7-4CB7-99E7-CA4FF4406BDD}.Release|Win32.Build.0 = Release|Win32
+		{3A64B0BD-52D7-4CB7-99E7-CA4FF4406BDD}.Release|x64.ActiveCfg = Release|x64
+		{3A64B0BD-52D7-4CB7-99E7-CA4FF4406BDD}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

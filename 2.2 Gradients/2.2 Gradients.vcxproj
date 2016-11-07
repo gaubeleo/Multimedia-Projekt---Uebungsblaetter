@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{B48B2055-0BCD-41BA-B2EF-1FF241444CDB}</ProjectGuid>
+    <ProjectGuid>{3A64B0BD-52D7-4CB7-99E7-CA4FF4406BDD}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>_2_2_Gradients</RootNamespace>
   </PropertyGroup>
