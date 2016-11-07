@@ -43,30 +43,35 @@ bool saveImg(string directory, string filename, Mat img){
 	return imwrite(fullFilename, img);
 }
 
+/////////////////////////////////////////////////////////////////////////////
+
 // filter on a single pixel
-void _filter(uchar* pixel, Mat &values, Mat &kernel, int normValue){
+void _filter(uchar* pixel, const Mat &values, const Mat &kernel, double normValue){
 	assert(values.channels() == 1);
 	assert(values.size() == kernel.size());
+	assert(kernel.type() == CV_64FC1);
+	assert(normValue != 0);
 
-	int value = 0;
+	double value = 0;
 	for (int y = 0; y < kernel.rows; y++){
-		uchar *rowKernel = kernel.ptr<uchar>(y);
-		uchar *rowValues = values.ptr<uchar>(y);
+		const double *rowKernel = kernel.ptr<double>(y);
+		const uchar *rowValues = values.ptr<uchar>(y);
 		for (int x = 0; x < kernel.cols; x++){
-			value += (int)rowKernel[x] * (int)rowValues[x];
+			value += rowKernel[x] * (double)rowValues[x];
 		}
 	}
-	*pixel = (uchar)(value / normValue);
+	*pixel = (uchar) max(0., value / normValue);
 }
 
-Mat filter(Mat &img, Mat &kernel, bool normalize){
+Mat filter(const Mat &img, const Mat &kernel, bool normalize){
 	assert(kernel.rows % 2 == 1 && kernel.cols % 2 == 1);
+	assert(kernel.type() == CV_64FC1);
 
 	Mat filteredImg(img.rows, img.cols, CV_8UC1, Scalar(0));
 
 	double normValue = 0.;
 	for (int y = 0; y < kernel.rows; y++){
-		uchar *row = kernel.ptr<uchar>(y);
+		const double *row = kernel.ptr<double>(y);
 		for (int x = 0; x < kernel.cols; x++){
 			normValue += row[x];
 		}
@@ -90,15 +95,18 @@ Mat filter(Mat &img, Mat &kernel, bool normalize){
 				continue;
 			}
 
-			Mat tmp = img(Rect(x - xOffset, y - yOffset, kernel.cols, kernel.rows));
-			_filter(&row[x], tmp, kernel, normValue);
+			const Mat tmp = img(Rect(x - xOffset, y - yOffset, kernel.cols, kernel.rows));
+			if (normalize)
+				_filter(&row[x], tmp, kernel, normValue);
+			else
+				_filter(&row[x], tmp, kernel, 1.);
 		}
 	}
 	return filteredImg;
 }
 
-Mat box(Mat &img, int kernelHeight, int kernelWidth){
-	Mat kernel(kernelHeight, kernelWidth, CV_8UC1, Scalar(1));
+Mat box(const Mat &img, int kernelHeight, int kernelWidth){
+	Mat kernel(kernelHeight, kernelWidth, CV_64FC1, Scalar(1.));
 	return filter(img, kernel, true);
 }
 
@@ -119,18 +127,18 @@ Mat createGaussianKernel(int kernelHeight, int kernelWidth, double sigma){
 	return kernel;
 }
 
-Mat gaussian(Mat &img, int kernelHeight, int kernelWidth, double sigma){
+Mat gaussian(const Mat &img, int kernelHeight, int kernelWidth, double sigma){
 	Mat kernel = createGaussianKernel(kernelHeight, kernelWidth, sigma);
 	return filter(img, kernel, true);
 }
 
 // median value of the neighbourhood of a single pixel
-void _median(uchar* pixel, Mat &values, int kernelHeight, int kernelWidth){
+void _median(uchar* pixel, const Mat &values, int kernelHeight, int kernelWidth){
 	assert(values.channels() == 1);
 
 	vector<uchar> listValues(0);
 	for (int y = 0; y < kernelHeight; y++){
-		uchar *rowValues = values.ptr<uchar>(y);
+		const uchar *rowValues = values.ptr<uchar>(y);
 		for (int x = 0; x < kernelWidth; x++){
 			listValues.push_back(rowValues[x]);
 		}
@@ -143,7 +151,7 @@ void _median(uchar* pixel, Mat &values, int kernelHeight, int kernelWidth){
 	*pixel = median;
 }
 
-Mat median(Mat &img, int kernelHeight, int kernelWidth){
+Mat median(const Mat &img, int kernelHeight, int kernelWidth){
 	assert(kernelHeight % 2 == 1 && kernelWidth % 2 == 1);
 	Mat medianImg(img.rows, img.cols, CV_8UC1, Scalar(0));
 
@@ -195,6 +203,8 @@ Mat createTestPattern(int w, int h){
 Mat createTestPattern(){
 	return createTestPattern(400, 400);
 }
+
+/////////////////////////////////////////////////////////////////////////////
 
 int main(){
 	int w = 500, h = 500;
