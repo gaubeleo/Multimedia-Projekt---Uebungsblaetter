@@ -207,7 +207,7 @@ Mat createTestPattern(){
 /////////////////////////////////////////////////////////////////////////////
 
 int main(){
-	int w = 500, h = 500;
+	int w = 512, h = 512;
 	Mat cvTestPattern(h, w, CV_8UC1);
 	Mat testPattern = createTestPattern(w, h);
 	saveImg("results", "Test Pattern.jpg", testPattern);
