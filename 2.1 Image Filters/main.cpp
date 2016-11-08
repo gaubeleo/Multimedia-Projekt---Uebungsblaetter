@@ -233,6 +233,7 @@ int main(){
 		medianBlur(cvQ2, cvQ2, size);
 
 		saveImg("results", "Filtered Test Pattern_" + to_string(size) + "_" + to_string(size) + ".jpg", testPattern);
+		saveImg("results", "OpenCV Filtered Test Pattern_" + to_string(size) + "_" + to_string(size) + ".jpg", cvTestPattern);
 
 		imshow("Test Pattern", testPattern);
 		imshow("OpenCV Test Pattern", cvTestPattern);

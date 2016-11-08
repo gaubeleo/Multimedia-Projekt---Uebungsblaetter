@@ -77,21 +77,9 @@ Mat filter(const Mat &img, const Mat &kernel, bool normalize){
 	int yOffset = (kernel.rows - 1) / 2;
 	int xOffset = (kernel.cols - 1) / 2;
 
-	for (int y = 0; y < img.rows; y++){
-		//copy border from original Image
-		if (y < yOffset || y >= img.rows - yOffset){
-			
-			continue;
-		}
-
+	for (int y = yOffset; y < img.rows-yOffset; y++){
 		short *row = filteredImg.ptr<short>(y);
-		for (int x = 0; x < img.cols; x++){
-			//copy border from original Image
-			if (x < xOffset || x >= img.cols - xOffset){
-				row[x] = img.at<uchar>(y, x);
-				continue;
-			}
-
+		for (int x = xOffset; x < img.cols-xOffset; x++){
 			const Mat tmp = img(Rect(x - xOffset, y - yOffset, kernel.cols, kernel.rows));
 			if (normalize)
 				_filter(&row[x], tmp, kernel, normValue);
@@ -173,7 +161,7 @@ Mat calcGradients(const Mat &X, const Mat &Y){
 	assert(X.size() == Y.size());
 	assert(X.type() == CV_16SC1 && Y.type() == CV_16SC1);
 
-	Mat gradients(X.rows, X.cols, CV_32FC1);
+	Mat gradients(X.rows, X.cols, CV_64FC1);
 
 	for (int y = 0; y < gradients.rows; y++){
 		double *row = gradients.ptr<double>(y);
@@ -188,7 +176,7 @@ Mat calcGradients(const Mat &X, const Mat &Y){
 }
 
 void _drawGradient(Mat &gradImg, int x, int y, double gradDir, short gradMag){
-	double length = 0.05;
+	double length = 0.06;
 	int xOffset = (gradMag * cos(gradDir) * length)/2;
 	int yOffset = (gradMag * sin(gradDir) * length)/2;
 
@@ -205,7 +193,7 @@ void _drawGradient(Mat &gradImg, int x, int y, double gradDir, short gradMag){
 
 Mat drawGradients(const Mat &img, const Mat &gradients, const Mat &dervMag){
 	assert(img.channels() == 3);
-	assert(img.type() == CV_8UC3 && gradients.type() == CV_32FC1 && dervMag.type() == CV_16SC1);
+	assert(img.type() == CV_8UC3 && gradients.type() == CV_64FC1 && dervMag.type() == CV_16SC1);
 	assert(img.size() == gradients.size() && img.size() == dervMag.size());
 
 	short threshold = 150;
@@ -250,9 +238,9 @@ int main(){
 
 	// displaying and saving images
 
-	//imshow("Sobel X", dervImgX);
-	//imshow("Sobel Y", dervImgY);
-	//imshow("Magnitude", dervImgMag);
+	imshow("Sobel X", dervImgX);
+	imshow("Sobel Y", dervImgY);
+	imshow("Magnitude", dervImgMag);
 	imshow("Gradient Image", gradImg);
 
 	saveImg("results", "Sobel X.jpg", dervImgX);
