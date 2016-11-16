@@ -135,7 +135,7 @@ Mat calcGradients(const Mat &X, const Mat &Y){
 		const short *rowX = X.ptr<short>(y);
 		const short *rowY = Y.ptr<short>(y);
 		for (int x = 0; x < gradients.cols; x++){
-			double direction = (atan2(rowY[x], rowX[x])+PI)/2.;
+			double direction = abs(atan2(rowY[x], rowX[x]));
 			row[x] = direction;
 		}
 	}
@@ -154,13 +154,23 @@ Mat calcGradients(Mat img){
 
 
 
-double toDegree(double orientation){
-	assert(orientation >= 0 && orientation < PI);
+double toDegree(double radiant){
+	assert(radiant >= 0 && radiant <= 2*PI);
 
-	double degree = (orientation / PI) * 180.;
+	double degree = (radiant * 360.) / (2 * PI);
 
 	return degree;
 }
+
+double toRadiant(double degree){
+	assert(degree >= 0 && degree <= 360.);
+
+	double radiant = (degree * 2 * PI) / (360.);
+
+	return radiant;
+}
+
+
 
 // bin0 --> 10°
 // bin1 --> 30°
@@ -174,8 +184,8 @@ double toDegree(double orientation){
 
 // 0° --> each bin0 and bin8 get 0.5*magnitude
 
-double*** compute_HoG(const cv::Mat& img, const int cellSize, const std::vector<int> &dims){
-	assert(img.type == CV_8UC1);
+double*** compute_HoG(const Mat &img, const int cellSize, const std::vector<int> &dims){
+	assert(img.type() == CV_8UC1);
 	assert(dims.size() == 3);
 
 	const Mat X = sobelX(img);
@@ -185,7 +195,7 @@ double*** compute_HoG(const cv::Mat& img, const int cellSize, const std::vector<
 	Mat magnitude = calcMagnitude(X, Y);
 
 	assert(gradients.type() == CV_64FC1);
-	assert(magnitude.type() == CV_64FC1);
+	assert(magnitude.type() == CV_16SC1);
 
 	const int cellRows = dims.at(0);
 	const int cellCols = dims.at(1);
@@ -203,20 +213,25 @@ double*** compute_HoG(const cv::Mat& img, const int cellSize, const std::vector<
 			HoG[yCell][xCell] = (double*)malloc(sizeof(double)* binCount);
 			if (HoG[yCell][xCell] == NULL)
 				exit(1);
+			for (int b = 0; b < binCount; b++)
+				HoG[yCell][xCell][b] = 0.;
 		}
 	}
 
 	double orientation, degree;
-	for (int y = 0; y < img.rows; y++){
-		const uchar* row = gradients.ptr<uchar>(y);
-		const double* magRow = magnitude.ptr<double>(y);
+	for (int y = 0; y < img.rows - (img.rows%cellSize); y++){
+		const double* gradRow = gradients.ptr<double>(y);
+		const short* magRow = magnitude.ptr<short>(y);
 		int yCell = y / cellSize;
-		for (int x = 0; x < img.cols; x++){
+		for (int x = 0; x < img.cols - (img.cols%cellSize); x++){
+			if (magRow[x] == 0)
+				continue;
+
 			int xCell = x / cellSize;
-			orientation = row[x];
+			orientation = gradRow[x];
 			degree = toDegree(orientation);
 
-			double bin = (degree - 10.) / (180. / binCount);
+			double bin = (degree - 0.5*(180. / binCount)) / (180. / binCount);
 			if (bin < 0)
 				bin += binCount;
 
@@ -225,15 +240,20 @@ double*** compute_HoG(const cv::Mat& img, const int cellSize, const std::vector<
 
 			double lowerBinValue = (1. - (bin - (int)bin));
 			double upperBinValue = 1. - lowerBinValue;
-			HoG[yCell][xCell][lowerBin] += lowerBinValue * magRow[x];
-			HoG[yCell][xCell][upperBin] += upperBinValue * magRow[x];
+
+			//cout << yCell << ", " << xCell << ", " << lowerBin << ", " << upperBin << ", " << endl;
+
+			HoG[yCell][xCell][lowerBin] += lowerBinValue; // * magRow[x];
+			HoG[yCell][xCell][upperBin] += upperBinValue; // * magRow[x];
 		}
 	}
 	return HoG;
 }
 
-Mat visualizeHoG(const double*** HoG, const int cellSize, const std::vector<int> &dims){
+Mat visualizeHoG(double*** HoG, const int cellSize, const std::vector<int> &dims){
 	assert(dims.size() == 3);
+
+	const uchar tau = 30;
 
 	const int cellRows = dims.at(0);
 	const int cellCols = dims.at(1);
@@ -246,11 +266,44 @@ Mat visualizeHoG(const double*** HoG, const int cellSize, const std::vector<int>
 
 	for (int yCell = 0; yCell < cellRows; yCell++){
 		for (int xCell = 0; xCell< cellCols; xCell++){
+			double max = -1, min = -1;
 			for (int b = 0; b < binCount; b++){
-				int startX = 
+				double value = HoG[yCell][xCell][b];
+				if (value == 0)
+					continue;
+				if (max == -1 || value > max)
+					max = value;
+				if (min == -1 || value < min)
+					min = value;
+			}
+			if (min == -1 || max == -1){
+				//cout << "empty gradient" << endl;
+				continue;
+			}
 
-				uchar strength = 255;
-				cvDrawLine(HoGimage, start, end, Scalar(strength));
+			for (int b = 0; b < binCount; b++){
+				double HoGvalue = HoG[yCell][xCell][b];
+				if (HoGvalue == 0)
+					continue;
+
+				int degree = ((b * 180) / binCount) + (int)(0.5*(180. / binCount)); // bin0 --> 10°, ..., bin8 --> 170°
+				double gradDir = toRadiant(degree);
+
+				int centerX = xCell*cellSize + cellSize/2;
+				int centerY = yCell*cellSize + cellSize/2;
+
+				int length = cellSize;
+
+				int xOffset = (int)((cos(gradDir) * length)/2);
+				int yOffset = (int)((sin(gradDir) * length)/2);
+
+				Point start(centerX+xOffset, centerY+yOffset);
+				Point end(centerX-xOffset, centerY-yOffset);
+
+				//uchar strength = 255 * (HoGvalue / max);
+				uchar strength = tau + (uchar)((255-tau) * ((HoGvalue-min)/(max-min)));
+
+				line(HoGimage, start, end, Scalar(strength));
 			}
 		}
 	}
@@ -262,26 +315,33 @@ Mat visualizeHoG(const double*** HoG, const int cellSize, const std::vector<int>
 /////////////////////////////////////////////////////////////////////////////
 
 int main(){
-	Mat img = loadImg("src", "lenna.jpg", IMREAD_GRAYSCALE); //IMREAD_COLORW
+	//Mat img = loadImg("src", "Testimage_gradients.jpg", IMREAD_GRAYSCALE); //IMREAD_COLOR
+	//Mat img = loadImg("src", "lenna.jpg", IMREAD_GRAYSCALE);
+	Mat img = loadImg("src", "eye.png", IMREAD_GRAYSCALE);
 
-	// Aufgabe a)
+	// Aufgabe 3.1 a)
 	Mat gradients = calcGradients(img);
 
-	// Augabe b)
-	const int cellSize = 5;
-	const int binCount = 9;
-	const int cellRows = img.rows / cellSize;
-	const int cellCols = img.cols / cellSize;
+	// Augabe 3.1 b) + 3.2 a) + b)
+	for (int cellSize : {10, 20, 30}){
+		const int binCount = 9;
+		const int cellRows = img.rows / cellSize;
+		const int cellCols = img.cols / cellSize;
 
-	vector<int> dims = {cellRows, cellCols, binCount };
+		vector<int> dims = { cellRows, cellCols, binCount };
 
-	double*** HoG = compute_HoG(img, cellSize, dims);
+		// Aufgabe 3.1 b)
+		double*** HoG = compute_HoG(img, cellSize, dims);
 
-	Mat HoGimage = visualizeHoG(HoG, cellSize, dims);
+		// Aufgabe 3.2 a) + b) 
+		Mat HoGimage = visualizeHoG(HoG, cellSize, dims);
 
-	imshow("HoG Visualization", HoGimage);
-	waitKey();
-	destroyAllWindows();
+		saveImg("results", "HoG_Visualization_" + to_string(cellSize) + ".jpg", HoGimage);
+
+		imshow("HoG Visualization", HoGimage);
+		waitKey();
+		destroyAllWindows();
+	}
 
 	return 0;
 }
