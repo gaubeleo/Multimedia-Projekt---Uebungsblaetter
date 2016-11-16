@@ -157,6 +157,7 @@ Mat convertToImg(const Mat &img){
 	return convertedImg;
 }
 
+// gradients orentation interval ]-pi, pi[
 Mat calcGradients(const Mat &X, const Mat &Y){
 	assert(X.size() == Y.size());
 	assert(X.type() == CV_16SC1 && Y.type() == CV_16SC1);

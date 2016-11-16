@@ -15,6 +15,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "2.1 Image Filters", "2.1 Im
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "2.2 Gradients", "2.2 Gradients\2.2 Gradients.vcxproj", "{3A64B0BD-52D7-4CB7-99E7-CA4FF4406BDD}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "3.1 Extracting HOG Features", "3.1 Extracting HOG Features\3.1 Extracting HOG Features.vcxproj", "{F232E5CC-436D-4B5D-9D85-A0E8AB0203DD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -97,6 +99,18 @@ Global
 		{3A64B0BD-52D7-4CB7-99E7-CA4FF4406BDD}.Release|Win32.Build.0 = Release|Win32
 		{3A64B0BD-52D7-4CB7-99E7-CA4FF4406BDD}.Release|x64.ActiveCfg = Release|x64
 		{3A64B0BD-52D7-4CB7-99E7-CA4FF4406BDD}.Release|x64.Build.0 = Release|x64
+		{F232E5CC-436D-4B5D-9D85-A0E8AB0203DD}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{F232E5CC-436D-4B5D-9D85-A0E8AB0203DD}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{F232E5CC-436D-4B5D-9D85-A0E8AB0203DD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F232E5CC-436D-4B5D-9D85-A0E8AB0203DD}.Debug|Win32.Build.0 = Debug|Win32
+		{F232E5CC-436D-4B5D-9D85-A0E8AB0203DD}.Debug|x64.ActiveCfg = Debug|x64
+		{F232E5CC-436D-4B5D-9D85-A0E8AB0203DD}.Debug|x64.Build.0 = Debug|x64
+		{F232E5CC-436D-4B5D-9D85-A0E8AB0203DD}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{F232E5CC-436D-4B5D-9D85-A0E8AB0203DD}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{F232E5CC-436D-4B5D-9D85-A0E8AB0203DD}.Release|Win32.ActiveCfg = Release|Win32
+		{F232E5CC-436D-4B5D-9D85-A0E8AB0203DD}.Release|Win32.Build.0 = Release|Win32
+		{F232E5CC-436D-4B5D-9D85-A0E8AB0203DD}.Release|x64.ActiveCfg = Release|x64
+		{F232E5CC-436D-4B5D-9D85-A0E8AB0203DD}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
