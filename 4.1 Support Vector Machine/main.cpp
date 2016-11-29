@@ -45,7 +45,6 @@ Mat drawSets(const Mat &img, const Mat &data, const Mat &labels)
 		int y = (int)data.at<float>(i, 0);
 		int x = (int)data.at<float>(i, 1);
 
-		// -1. ^= pos label
 		if (label == 1.)
 			circle(newImg, Point(x, y), 3, Scalar(0, 255, 0), -1);
 		else if (label == -1.)
@@ -75,13 +74,13 @@ void createSets(Mat &data, Mat &labels, int margin, bool linearSperable)
 				x += 2 * margin;
 				y += 2 * margin;
 			}
-			label = (x + y) < 512 ? -1. : 1.;
+			label = (x + y) < 512 ? 1. : -1.;
 		}
 		else
 		{
 			x = rand() % 512;
 			y = rand() % 512;
-			label = (x + y) < 512 ? -1. : 1.;
+			label = (x + y) < 512 ? 1. : -1.;
 			if ((x + y) > 512 - margin && (x + y) < 512 + margin)
 				label = ((rand() % 2) * 2) - 1;
 		}
@@ -101,7 +100,7 @@ void trainSVM(const char* filename, const Mat &data, const Mat &labels, int maxI
 		params.kernel_type = CvSVM::LINEAR;
 	else
 		params.kernel_type = CvSVM::RBF;
-	params.term_crit = cvTermCriteria(CV_TERMCRIT_ITER, maxIter, 1e-8);
+	params.term_crit = cvTermCriteria(CV_TERMCRIT_ITER + CV_TERMCRIT_EPS, maxIter, 1e-6);
 
 	CvSVM SVM;
 	SVM.train_auto(data, labels, Mat(), Mat(), params);
@@ -145,65 +144,63 @@ Mat visualizeSVM(char* filename, const Mat& canvas, const Mat& data, const Mat& 
 }
 
 int main(){
-	int height = 512, width = 512, count = 100;
-	Mat black_canvas(height, width, CV_8UC3, Scalar(0, 0, 0));
-
-	// Aufgabe 4.1a)
-	Mat data(count, 2, CV_32FC1), labels(count, 1, CV_32FC1);
-	createSets(data, labels, 20, true);
-	
-	Mat &setCanvas = drawSets(black_canvas, data, labels);
-	
-	imshow("Pos and Neg Sets", setCanvas);
-	waitKey();
-	destroyAllWindows();
-
-	// Aufgabe 4.1b)
-	char* filename = "results\\linearHardSVM.xml";
+	// create "results" folder if not already existing
 	struct stat sb;
 	if (!(stat("results", &sb) == 0 && sb.st_mode == S_IFDIR)){
 		_mkdir("results");
 	}
 
-	trainSVM(filename, data, labels, 5000, true);
+	int height = 512, width = 512, count = 300;
+	Mat black_canvas(height, width, CV_8UC3, Scalar(0, 0, 0));
+
+	// Aufgabe 4.1a)
+	Mat dataHard(count, 2, CV_32FC1), labelsHard(count, 1, CV_32FC1);
+	createSets(dataHard, labelsHard, 20, true);
+	//Mat &setCanvas = drawSets(black_canvas, data, labels);
+
+	// Aufgabe 4.1b)
+	char* filename = "results\\linearHardSVM.xml";
+	trainSVM(filename, dataHard, labelsHard, 5000, true);
+
 	// Aufgabe 4.1c)
-	Mat SVMcanvas = visualizeSVM(filename, black_canvas, data, labels);
-	SVMcanvas = drawSets(SVMcanvas, data, labels);
+	Mat linearHardSVMcanvas = visualizeSVM(filename, black_canvas, dataHard, labelsHard);
+	linearHardSVMcanvas = drawSets(linearHardSVMcanvas, dataHard, labelsHard);
 
-	imshow("SVM Canvas", SVMcanvas);
+	saveImg("results", "linearHardSVM.jpg", linearHardSVMcanvas);
+
+	imshow("linearHardSVM", linearHardSVMcanvas);
 	waitKey();
 	destroyAllWindows();
 
-	// Aufagbe 4.2a)
-	Mat data2(count, 2, CV_32FC1), labels2(count, 1, CV_32FC1);
-	createSets(data2, labels2, 50, false);
-	Mat &setCanvas2 = drawSets(black_canvas, data2, labels2);
+	// Aufgabe 4.2a)
+	Mat dataSoft(count, 2, CV_32FC1), labelsSoft(count, 1, CV_32FC1);
+	createSets(dataSoft, labelsSoft, 50, false);
+	Mat &setCanvasSoft = drawSets(black_canvas, dataSoft, labelsSoft);
 
-	imshow("Soft Margin Set", setCanvas2);
-	waitKey();
-	destroyAllWindows();
-
-	// Aufagbe 4.2b)
+	// Aufgabe 4.2b)
 	filename = "results\\linearSoftSVM.xml";
 
-	trainSVM(filename, data, labels, 30000, true);
-	SVMcanvas = visualizeSVM(filename, black_canvas, data2, labels2);
-	SVMcanvas = drawSets(SVMcanvas, data2, labels2);
+	trainSVM(filename, dataSoft, labelsSoft, 100000, true);
+	Mat linearSoftSVMcanvas = visualizeSVM(filename, black_canvas, dataSoft, labelsSoft);
+	linearSoftSVMcanvas = drawSets(linearSoftSVMcanvas, dataSoft, labelsSoft);
 
-	imshow("SVM Canvas 2", SVMcanvas);
+	saveImg("results", "linearSoftSVM.jpg", linearSoftSVMcanvas);
+
+	imshow("SVM Canvas Soft", linearSoftSVMcanvas);
 	waitKey();
 	destroyAllWindows();
 
 	filename = "results\\rbfSoftSVM.xml";
 
-	trainSVM(filename, data, labels, 30000, false);
-	SVMcanvas = visualizeSVM(filename, black_canvas, data2, labels2);
-	SVMcanvas = drawSets(SVMcanvas, data2, labels2);
+	trainSVM(filename, dataSoft, labelsSoft, 100000, false);
+	Mat RBMSoftSVMcanvas = visualizeSVM(filename, black_canvas, dataSoft, labelsSoft);
+	RBMSoftSVMcanvas = drawSets(RBMSoftSVMcanvas, dataSoft, labelsSoft);
 
-	imshow("SVM Canvas RBF", SVMcanvas);
+	saveImg("results", "RBMSoftSVM.jpg", RBMSoftSVMcanvas);
+
+	imshow("SVM Canvas RBF", RBMSoftSVMcanvas);
 	waitKey();
 	destroyAllWindows();
-
 
 	return 0;
 }

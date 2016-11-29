@@ -4,7 +4,7 @@
   <svm_type>C_SVC</svm_type>
   <kernel><type>LINEAR</type></kernel>
   <C>1.0000000000000001e-001</C>
-  <term_criteria><epsilon>2.2204460492503131e-016</epsilon>
+  <term_criteria><epsilon>9.9999999747524271e-007</epsilon>
     <iterations>5000</iterations></term_criteria>
   <var_all>2</var_all>
   <var_count>2</var_count>
@@ -18,11 +18,11 @@
   <sv_total>1</sv_total>
   <support_vectors>
     <_>
-      -2.39076670e-002 -2.37427857e-002</_></support_vectors>
+      2.19780132e-002 2.19780188e-002</_></support_vectors>
   <decision_functions>
     <_>
       <sv_count>1</sv_count>
-      <rho>-1.2711294311602153e+001</rho>
+      <rho>1.1637358950034857e+001</rho>
       <alpha>
         1.</alpha>
       <index>
